@@ -1,0 +1,11 @@
+itching,skin_rash,continuous_sneezing,chills,joint_pain,vomiting,fatigue,weight_loss,cough,high_fever,headache,nausea,loss_of_appetite,pain_behind_the_eyes,back_pain,constipation,abdominal_pain,diarrhoea,mild_fever,yellowing_of_eyes,prognosis
+1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Fungal infection
+0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Allergy
+0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,1,0,0,1,GERD
+0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,Typhoid
+0,1,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,Chicken pox
+0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,Dengue
+0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,Pneumonia
+0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,Migraine
+0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,Arthritis
+1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Acne

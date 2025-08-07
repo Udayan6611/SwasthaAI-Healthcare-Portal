@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwasthaAI - Smart Healthcare Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #8A2BE2; /* A vibrant purple for selections */
+            --primary-dark: #7B1FA2;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --text-white: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        .header { text-align: center; margin-bottom: 40px; color: var(--text-white); }
+        .header h1 { font-size: 3.2em; font-weight: 700; margin-bottom: 10px; text-shadow: 2px 2px 8px rgba(0,0,0,0.2); }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo { font-size: 1.5em; font-weight: 600; color: var(--text-white); text-shadow: 1px 1px 4px rgba(0,0,0,0.2); }
+        
+        .language-selector {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-white);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .language-selector option { background: #fff; color: var(--text-dark); }
+
+        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+
+        .card h2 {
+            color: var(--text-white);
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 svg { filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.2)); }
+
+        .symptom-checker { grid-column: 1 / -1; }
+        .form-section { background: rgba(255,255,255,0.1); padding: 20px; border-radius: var(--radius-md); margin-bottom: 30px; }
+        .form-section h3 { color: var(--text-white); margin-bottom: 15px; font-size: 1.2em; font-weight: 500; opacity: 0.9; }
+        
+        .symptoms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .symptom-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .symptom-item:hover { border-color: var(--primary-color); transform: translateY(-3px); }
+        .symptom-item.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
+            transform: translateY(-3px);
+        }
+        .symptom-item .severity-selector { margin-top: 15px; }
+        
+        .severity-btn {
+            padding: 5px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            background: #f8fafc;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .symptom-item.selected .severity-btn { background: rgba(255, 255, 255, 0.2); color: white; border-color: rgba(255, 255, 255, 0.4); }
+        .symptom-item.selected .severity-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        .symptom-item.selected .severity-btn.active { background: white; color: var(--primary-color); font-weight: 600; }
+        
+        .age-selector, .duration-grid { display: grid; gap: 10px; }
+        .age-selector { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+        .duration-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+        
+        .age-option, .duration-option {
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        .age-option:hover, .duration-option:hover { border-color: var(--primary-color); }
+        .age-option.selected, .duration-option.selected { background: var(--primary-color); color: white; border-color: var(--primary-dark); }
+        
+        .chat-container { height: 450px; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; background: #fff; border-radius: var(--radius-md); padding: 20px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        
+        .message { margin-bottom: 15px; padding: 12px 18px; border-radius: 20px; max-width: 85%; line-height: 1.6; animation: fadeIn 0.4s ease; }
+        .user-message { background: var(--primary-color); color: white; margin-left: auto; border-bottom-right-radius: 5px; }
+        .bot-message { background: #e2e8f0; color: var(--text-dark); border-bottom-left-radius: 5px; }
+        
+        .chat-input-container { display: flex; gap: 10px; }
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+            outline: none;
+            font-size: 14px;
+            background: #fff;
+        }
+        
+        .btn { padding: 12px 25px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s ease; }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4); }
+
+        .results-section { grid-column: 1 / -1; display: none; background: rgba(255, 255, 255, 0.2); }
+        .analysis-summary { background: rgba(255,255,255,0.2); border: 1px solid var(--card-border); padding: 25px; border-radius: var(--radius-lg); margin-bottom: 25px; text-align: center; }
+        .analysis-summary h3 { color: var(--text-white); font-size: 1.5em; margin-bottom: 10px; }
+        
+        .priority-badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: capitalize; }
+        .priority-urgent { background: #fee2e2; color: #b91c1c; }
+        .priority-moderate { background: #ffedd5; color: #c2410c; }
+        .priority-routine { background: #dcfce7; color: #166534; }
+        
+        .recommendation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .recommendation-card { background: #fff; padding: 25px; border-radius: var(--radius-md); border: 1px solid #e2e8f0; }
+        .recommendation-card h4 { display: flex; align-items: center; gap: 10px; font-size: 1.2em; margin-bottom: 15px; color: var(--text-dark); }
+        .recommendation-card h4 svg { color: var(--primary-color); }
+        .recommendation-card p { line-height: 1.7; color: var(--text-light); white-space: pre-wrap; }
+        
+        .loader { border: 4px solid rgba(255,255,255,0.2); border-radius: 50%; border-top: 4px solid var(--text-white); width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 30px auto; display: none; }
+        
+        .required { color: #fecaca; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+            .recommendation-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toolbar">
+            <div class="logo">SwasthaAI</div>
+            <select class="language-selector" id="languageSelector">
+                <option value="en">English</option>
+                <option value="mr">मराठी (Marathi)</option>
+                <option value="hi">हिंदी (Hindi)</option>
+            </select>
+        </div>
+        <header class="header">
+            <h1 data-key="main-title">Smart Healthcare Portal</h1>
+            <p data-key="subtitle">AI-Powered Health Assistant with Personalized Recommendations</p>
+        </header>
+
+        <div class="main-content">
+            <div class="card symptom-checker">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10c0-4.97-3.69-9.26-8.54-9.95M12 2v10l6 2"></path><path d="M12 12H2.05A10 10 0 0 0 12 22v-2c0-2.21-1.79-4-4-4H4"></path></svg>
+                    <span data-key="symptom-analyzer-title">Smart Symptom Analysis</span>
+                </h2>
+                
+                <div class="form-section">
+                    <h3 data-key="patient-info-title">Patient Information</h3>
+                    <div class="age-selector" id="ageSelector">
+                        <div class="age-option" data-age="child" data-key="age-child">Child</div>
+                        <div class="age-option" data-age="teen" data-key="age-teen">Teen</div>
+                        <div class="age-option" data-age="adult" data-key="age-adult">Adult</div>
+                        <div class="age-option" data-age="senior" data-key="age-senior">Senior</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 data-key="symptoms-title">Select Symptoms <span class="required">*</span></h3>
+                    <div class="symptoms-grid" id="symptomsGrid"></div>
+                </div>
+
+                <div class="form-section">
+                    <h3 data-key="duration-title">Symptom Duration <span class="required">*</span></h3>
+                    <div class="duration-grid" id="durationGrid">
+                        <div class="duration-option" data-duration="1-2 days" data-key="duration-1-2">1-2 Days</div>
+                        <div class="duration-option" data-duration="3-5 days" data-key="duration-3-5">3-5 Days</div>
+                        <div class="duration-option" data-duration="1 week" data-key="duration-1w">1 Week</div>
+                        <div class="duration-option" data-duration="2+ weeks" data-key="duration-2w">2+ Weeks</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" id="analyzeBtn" data-key="analyze-btn" style="padding: 15px 40px; font-size: 16px;">Analyze Symptoms</button>
+                    <div class="loader" id="loader"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                    <span data-key="ai-assistant-title">AI Health Assistant</span>
+                </h2>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot-message" data-key="bot-greeting">Hello! I'm your AI health assistant.</div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" data-key="chat-placeholder" placeholder="Ask a general health question...">
+                        <button class="btn btn-primary" id="sendBtn" data-key="send-btn">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card results-section" id="resultsSection">
+             <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                <span data-key="results-title">Personalized Recommendations</span>
+            </h2>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5000/api/symptoms';
+        const SYMPTOMS_LIST = [ 'headache', 'fever', 'cough', 'sore_throat', 'nausea', 'fatigue', 'chest_pain', 'shortness_breath', 'dizziness', 'stomach_pain', 'joint_pain', 'rash', 'itching', 'skin_rash', 'continuous_sneezing', 'chills', 'vomiting', 'weight_loss', 'loss_of_appetite', 'pain_behind_the_eyes', 'back_pain', 'constipation', 'abdominal_pain', 'diarrhoea', 'mild_fever', 'yellowing_of_eyes' ];
+        
+        const translations = {
+            en: { "main-title": "Smart Healthcare Portal", "subtitle": "AI-Powered Health Assistant", "symptom-analyzer-title": "Smart Symptom Analysis", "patient-info-title": "Patient Information", "age-group-label": "Age Group", "age-child": "Child", "age-teen": "Teen", "age-adult": "Adult", "age-senior": "Senior", "symptoms-title": "Select Symptoms", "duration-title": "Symptom Duration", "duration-1-2": "1-2 Days", "duration-3-5": "3-5 Days", "duration-1w": "1 Week", "duration-2w": "2+ Weeks", "analyze-btn": "Analyze Symptoms", "ai-assistant-title": "AI Health Assistant", "bot-greeting": "Hello! Ask me a general health question, or use the symptom checker for a detailed analysis.", "chat-placeholder": "Ask a health question...", "send-btn": "Send", "results-title": "Personalized Recommendations", "severity-mild": "Mild", "severity-moderate": "Moderate", "severity-severe": "Severe", "rec-specialist": "Recommended Specialist", "rec-advice": "Advice & Next Steps", "symptom-headache": "Headache", "symptom-fever": "Fever", "symptom-cough": "Cough", "symptom-sore_throat": "Sore Throat", "symptom-nausea": "Nausea", "symptom-fatigue": "Fatigue", "symptom-chest_pain": "Chest Pain", "symptom-shortness_breath": "Shortness of Breath", "symptom-dizziness": "Dizziness", "symptom-stomach_pain": "Stomach Pain", "symptom-joint_pain": "Joint Pain", "symptom-rash": "Rash", "symptom-itching": "Itching", "symptom-skin_rash": "Skin Rash", "symptom-continuous_sneezing": "Continuous Sneezing", "symptom-chills": "Chills", "symptom-vomiting": "Vomiting", "symptom-weight_loss": "Weight Loss", "symptom-loss_of_appetite": "Loss of Appetite", "symptom-pain_behind_the_eyes": "Pain Behind Eyes", "symptom-back_pain": "Back Pain", "symptom-constipation": "Constipation", "symptom-abdominal_pain": "Abdominal Pain", "symptom-diarrhoea": "Diarrhoea", "symptom-mild_fever": "Mild Fever", "symptom-yellowing_of_eyes": "Yellowing of Eyes" },
+            mr: { "main-title": "स्मार्ट हेल्थकेअर पोर्टल", "subtitle": "AI-शक्तीवर आधारित आरोग्य सहाय्यक", "symptom-analyzer-title": "स्मार्ट लक्षण विश्लेषण", "patient-info-title": "रुग्णाची माहिती", "age-group-label": "वयोगट", "age-child": "बालक", "age-teen": "किशोर", "age-adult": "प्रौढ", "age-senior": "ज्येष्ठ", "symptoms-title": "लक्षणे निवडा", "duration-title": "लक्षणांचा कालावधी", "duration-1-2": "१-२ दिवस", "duration-3-5": "३-५ दिवस", "duration-1w": "१ आठवडा", "duration-2w": "२+ आठवडे", "analyze-btn": "विश्लेषण करा", "ai-assistant-title": "AI आरोग्य सहाय्यक", "bot-greeting": "नमस्कार! विश्लेषणसाठी लक्षणे तपासा, किंवा प्रश्न विचारा.", "chat-placeholder": "आरोग्याबद्दल प्रश्न विचारा...", "send-btn": "पाठवा", "results-title": "वैयक्तिक शिफारसी", "severity-mild": "सौम्य", "severity-moderate": "मध्यम", "severity-severe": "तीव्र", "rec-specialist": "शिफारस केलेले विशेषज्ञ", "rec-advice": "सल्ला आणि पुढील पायऱ्या", "symptom-headache": "डोकेदुखी", "symptom-fever": "ताप", "symptom-cough": "खोकला", "symptom-sore_throat": "घसा खवखवणे", "symptom-nausea": "मळमळ", "symptom-fatigue": "थकवा", "symptom-chest_pain": "छातीत दुखणे", "symptom-shortness_breath": "श्वास लागणे", "symptom-dizziness": "चक्कर येणे", "symptom-stomach_pain": "पोटदुखी", "symptom-joint_pain": "सांधेदुखी", "symptom-rash": "पुरळ", "symptom-itching": "खाज सुटणे", "symptom-skin_rash": "त्वचेवर पुरळ", "symptom-continuous_sneezing": "सतत शिंका येणे", "symptom-chills": "थंडी वाजून येणे", "symptom-vomiting": "उलट्या", "symptom-weight_loss": "वजन कमी होणे", "symptom-loss_of_appetite": "भूक न लागणे", "symptom-pain_behind_the_eyes": "डोळ्यांमागे दुखणे", "symptom-back_pain": "पाठदुखी", "symptom-constipation": "बद्धकोष्ठता", "symptom-abdominal_pain": "ओटीपोटात दुखणे", "symptom-diarrhoea": "अतिसार", "symptom-mild_fever": "सौम्य ताप", "symptom-yellowing_of_eyes": "डोळे पिवळे होणे" },
+            hi: { "main-title": "स्मार्ट हेल्थकेयर पोर्टल", "subtitle": "AI-संचालित स्वास्थ्य सहायक", "symptom-analyzer-title": "स्मार्ट लक्षण विश्लेषण", "patient-info-title": "मरीज़ की जानकारी", "age-group-label": "आयु वर्ग", "age-child": "बच्चा", "age-teen": "किशोर", "age-adult": "वयस्क", "age-senior": "वरिष्ठ", "symptoms-title": "लक्षण चुनें", "duration-title": "लक्षणों की अवधि", "duration-1-2": "१-२ दिन", "duration-3-5": "३-५ दिन", "duration-1w": "१ सप्ताह", "duration-2w": "२+ सप्ताह", "analyze-btn": "विश्लेषण करें", "ai-assistant-title": "AI स्वास्थ्य सहायक", "bot-greeting": "नमस्ते! विश्लेषण के लिए लक्षण परीक्षक भरें, या स्वास्थ्य प्रश्न पूछें।", "chat-placeholder": "स्वास्थ्य प्रश्न पूछें...", "send-btn": "भेजें", "results-title": "व्यक्तिगत सिफारिशें", "severity-mild": "हल्का", "severity-moderate": "मध्यम", "severity-severe": "गंभीर", "rec-specialist": "अनुशंसित विशेषज्ञ", "rec-advice": "सलाह और अगले कदम", "symptom-headache": "सिरदर्द", "symptom-fever": "बुखार", "symptom-cough": "खांसी", "symptom-sore_throat": "गले में खराश", "symptom-nausea": "जी मिचलाना", "symptom-fatigue": "थकान", "symptom-chest_pain": "सीने में दर्द", "symptom-shortness_breath": "सांस की तकलीफ", "symptom-dizziness": "चक्कर आना", "symptom-stomach_pain": "पेट दर्द", "symptom-joint_pain": "जोड़ों का दर्द", "symptom-rash": "लाल चकत्ते", "symptom-itching": "खुजली", "symptom-skin_rash": "त्वचा पर दाने", "symptom-continuous_sneezing": "लगातार छींकना", "symptom-chills": "ठंड लगना", "symptom-vomiting": "उल्टी", "symptom-weight_loss": "वजन घटना", "symptom-loss_of_appetite": "भूख न लगना", "symptom-pain_behind_the_eyes": "आंखों के पीछे दर्द", "symptom-back_pain": "पीठ दर्द", "symptom-constipation": "कब्ज", "symptom-abdominal_pain": "पेट में दर्द", "symptom-diarrhoea": "दस्त", "symptom-mild_fever": "हल्का बुखार", "symptom-yellowing_of_eyes": "आंखों का पीला पड़ना" }
+        };
+
+        let state = { selectedSymptoms: {}, selectedAge: null, selectedDuration: null, currentLanguage: 'en' };
+
+        function setLanguage(lang) {
+            state.currentLanguage = lang;
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang] && translations[lang][key]) {
+                    if (element.tagName === 'INPUT') element.placeholder = translations[lang][key];
+                    else element.textContent = translations[lang][key];
+                }
+            });
+            populateSymptoms(); 
+        }
+
+        function populateSymptoms() {
+            const symptomsGrid = document.getElementById('symptomsGrid');
+            symptomsGrid.innerHTML = ''; 
+            const lang = state.currentLanguage;
+
+            SYMPTOMS_LIST.forEach(symptomKey => {
+                const item = document.createElement('div');
+                item.className = 'symptom-item';
+                item.dataset.symptom = symptomKey;
+
+                const nameDiv = document.createElement('div');
+                nameDiv.textContent = translations[lang][`symptom-${symptomKey}`] || symptomKey.replace(/_/g, ' ');
+                item.appendChild(nameDiv);
+
+                const severitySelector = document.createElement('div');
+                severitySelector.className = 'severity-selector';
+                ['mild', 'moderate', 'severe'].forEach(sev => {
+                    const btn = document.createElement('span');
+                    btn.className = 'severity-btn';
+                    btn.dataset.severity = sev;
+                    btn.textContent = translations[lang][`severity-${sev}`] || sev;
+                    severitySelector.appendChild(btn);
+                });
+
+                item.appendChild(severitySelector);
+
+                if (state.selectedSymptoms[symptomKey]) {
+                    item.classList.add('selected');
+                    const selectedSeverity = state.selectedSymptoms[symptomKey].severity;
+                    const activeBtn = item.querySelector(`.severity-btn[data-severity="${selectedSeverity}"]`);
+                    if (activeBtn) activeBtn.classList.add('active');
+                }
+                symptomsGrid.appendChild(item);
+            });
+        }
+        
+        document.getElementById('languageSelector').addEventListener('change', (e) => setLanguage(e.target.value));
+        document.addEventListener('DOMContentLoaded', () => setLanguage('en'));
+
+        document.getElementById('symptomsGrid').addEventListener('click', (e) => {
+            const symptomItem = e.target.closest('.symptom-item');
+            if (!symptomItem) return;
+            const symptom = symptomItem.dataset.symptom;
+            if (e.target.classList.contains('severity-btn')) {
+                symptomItem.classList.add('selected');
+                symptomItem.querySelectorAll('.severity-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                state.selectedSymptoms[symptom] = { severity: e.target.dataset.severity };
+            } else {
+                symptomItem.classList.toggle('selected');
+                if (symptomItem.classList.contains('selected')) {
+                    if (!state.selectedSymptoms[symptom]) {
+                        symptomItem.querySelector('.severity-btn[data-severity="mild"]').classList.add('active');
+                        state.selectedSymptoms[symptom] = { severity: 'mild' };
+                    }
+                } else {
+                    delete state.selectedSymptoms[symptom];
+                    symptomItem.querySelectorAll('.severity-btn').forEach(btn => btn.classList.remove('active'));
+                }
+            }
+        });
+
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatInput = document.getElementById('chatInput');
+        const ageSelector = document.getElementById('ageSelector');
+        const durationGrid = document.getElementById('durationGrid');
+        
+        ageSelector.addEventListener('click', (e) => {
+            if (e.target.classList.contains('age-option')) {
+                document.querySelectorAll('#ageSelector .age-option').forEach(el => el.classList.remove('selected'));
+                e.target.classList.add('selected');
+                state.selectedAge = e.target.dataset.age;
+            }
+        });
+
+        durationGrid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('duration-option')) {
+                document.querySelectorAll('#durationGrid .duration-option').forEach(el => el.classList.remove('selected'));
+                e.target.classList.add('selected');
+                state.selectedDuration = e.target.dataset.duration;
+            }
+        });
+        
+        analyzeBtn.addEventListener('click', analyzeSymptoms);
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+        async function analyzeSymptoms() {
+            const loader = document.getElementById('loader');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContent = document.getElementById('resultsContent');
+
+            if (!state.selectedAge || Object.keys(state.selectedSymptoms).length === 0 || !state.selectedDuration) {
+                alert('Please select age, at least one symptom, and duration.'); return;
+            }
+            loader.style.display = 'block';
+            analyzeBtn.disabled = true;
+            resultsSection.style.display = 'none';
+
+            const payload = {
+                ageGroup: state.selectedAge,
+                symptoms: state.selectedSymptoms,
+                duration: state.selectedDuration,
+                language: state.currentLanguage
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'AI service is not responding.');
+                }
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                resultsContent.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                resultsSection.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+                analyzeBtn.disabled = false;
+            }
+        }
+        
+        async function sendMessage() {
+            const chatMessages = document.getElementById('chatMessages');
+            const query = chatInput.value.trim();
+            if (!query) return;
+            addMessage(query, 'user-message');
+            chatInput.value = '';
+            chatInput.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, language: state.currentLanguage })
+                });
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+                addMessage(data.response, 'bot-message');
+            } catch (error) {
+                addMessage('I am having trouble connecting right now. Please try again later.', 'bot-message');
+            } finally {
+                chatInput.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        function displayResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContent = document.getElementById('resultsContent');
+            resultsSection.style.display = 'block';
+            const priority = data.priority || 'moderate';
+            const priorityClass = `priority-${priority.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '')}`;
+            
+            const specialistTitle = translations[state.currentLanguage]['rec-specialist'] || 'Recommended Specialist';
+            const adviceTitle = translations[state.currentLanguage]['rec-advice'] || 'Advice & Next Steps';
+
+            const summaryHTML = `
+                <div class="analysis-summary">
+                    <h3>Analysis for: ${data.predicted_disease}</h3>
+                    <p><span class="priority-badge ${priorityClass}">${priority}</span></p>
+                </div>
+                <div class="recommendation-grid">
+                    <div class="recommendation-card">
+                        <h4>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                           <span>${specialistTitle}</span>
+                        </h4>
+                        <p>${data.specialist}</p>
+                    </div>
+                    <div class="recommendation-card">
+                         <h4>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                            <span>${adviceTitle}</span>
+                        </h4>
+                        <p>${data.advice}</p>
+                    </div>
+                </div>
+            `;
+            resultsContent.innerHTML = summaryHTML;
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function addMessage(text, className) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>

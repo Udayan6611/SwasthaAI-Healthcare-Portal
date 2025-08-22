@@ -183,5 +183,5 @@ Want to contribute? Found a bug or idea? Please feel free to raise an issue or s
 ## ✨ Acknowledgements
 
 - Google AI Studio (Gemini API)
-- Flask & Express communities
-- scikit-learn developers
+- Flask & Express Communities
+- scikit-learn Developers
